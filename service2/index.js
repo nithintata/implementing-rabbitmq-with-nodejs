@@ -64,6 +64,7 @@ function startProcessing() {
       console.log("[AMQP] channel closed");
     });
 
+    //checks if there is queue with tha given name otherwise creates new one and proceeds
     channel.assertQueue("user-messages", {durable: true}, (err, ok) => {
       if (err) {
         console.error("[AMQP] error", err);
@@ -74,9 +75,9 @@ function startProcessing() {
         processMsg(msg, (isDone) => {
           try {
             if (isDone)
-              channel.ack(msg);
+              channel.ack(msg); //if completed successfully acknowledge the message
             else
-              channel.reject(msg, true);
+              channel.reject(msg, true); //else reject the message
           } catch (error) {
             console.error("[AMQP] error!", error);
             amqpConn.close();
@@ -94,7 +95,7 @@ function processMsg(msg, callback) {
   callback(true);
 }
 
-start();
+start();  //start connecting to AMQP Service
 
 server.listen(PORT, () => {
   console.log(`Server is running at port: ${PORT}`);
